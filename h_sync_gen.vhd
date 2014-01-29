@@ -44,8 +44,8 @@ architecture Behavioral of h_sync_gen is
 		(sync, back_porch, active_video, front_port, completed_sig_gen);
 	signal state_reg, state_next, counter_reg, counter_next: state_type;
 	signal h_sync_next, blank_next, completed_next: std_logic;
-	signal h_sync_buf_reg, blank_buf_reg, completed_buf_reg: std_logic;
-	signal column_next, column_buf_reg: unsigned (10 downto 0);
+	signal h_sync_reg, blank_reg, completed_reg: std_logic;
+	signal column_next, column_reg: unsigned (10 downto 0);
 begin
 	--state register
 	process(clk, reset)
@@ -56,9 +56,10 @@ begin
 			state_reg <= state_next;
 		end if;
 	end process;
-	--output buffer
+	--next-state logic
 	process(clk, reset)
 	begin
+		
 	end process;
 
 

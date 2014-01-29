@@ -19,7 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
+use IEEE.NUMERIC_STD.all;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --use IEEE.NUMERIC_STD.ALL;
@@ -40,8 +40,26 @@ entity h_sync_gen is
 end h_sync_gen;
 
 architecture Behavioral of h_sync_gen is
-
+	type state_type is
+		(sync, back_porch, active_video, front_port, completed_sig_gen);
+	signal state_reg, state_next, counter_reg, counter_next: state_type;
+	signal h_sync_next, blank_next, completed_next: std_logic;
+	signal h_sync_buf_reg, blank_buf_reg, completed_buf_reg: std_logic;
+	signal column_next, column_buf_reg: unsigned (10 downto 0);
 begin
+	--state register
+	process(clk, reset)
+	begin
+		if (reset='1') then
+			state_reg <= sync;
+		elsif (clk'event and clk='1') then
+			state_reg <= state_next;
+		end if;
+	end process;
+	--output buffer
+	process(clk, reset)
+	begin
+	end process;
 
 
 end Behavioral;

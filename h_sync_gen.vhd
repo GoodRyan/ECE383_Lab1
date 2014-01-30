@@ -24,12 +24,12 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity h_sync_gen is
-	port( clk		: in std_logic;
-			reset		: in std_logic;
-			h_sync	: out std_logic;
-			blank		: out std_logic;
-			completed : out std_logic;
-			column	: out unsigned (10 downto 0)
+	port( clk			: in std_logic;
+			reset			: in std_logic;
+			h_sync		: out std_logic;
+			blank			: out std_logic;
+			completed	: out std_logic;
+			column		: out unsigned (10 downto 0)
 	);
 end h_sync_gen;
 

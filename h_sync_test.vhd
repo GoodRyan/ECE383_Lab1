@@ -60,6 +60,7 @@ ARCHITECTURE behavior OF h_sync_test IS
    signal completed : std_logic;
    signal column : unsigned(10 downto 0);
 
+
    -- Clock period definitions
    constant clk_period : time := 1 ns;
  
@@ -73,6 +74,7 @@ BEGIN
           blank => blank,
           completed => completed,
           column => column
+
         );
 
    -- Clock process definitions
@@ -91,17 +93,15 @@ BEGIN
       wait for clk_period;	
 		
 		reset <= '1';
-		
 		wait for clk_period;
 		
 		reset <= '0';
 		wait for clk_period;
-		assert h_sync = '1' report "sync h_sync incorrect" severity error;
-		assert blank = '0'; report "sync blank incorrect" severity error;
+		
+		assert h_sync = '0' report "sync h_sync incorrect" severity error;
+		assert blank = '1' report "sync blank incorrect" severity error;
 		assert completed = '0' report "sync completed incorrect" severity error;
 		assert column = "00000000000" report "sync column incorrect" severity error;
-
-      wait for clk_period*10;
 
       -- insert stimulus here 
 

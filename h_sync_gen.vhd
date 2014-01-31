@@ -47,8 +47,10 @@ begin
 	begin
 		if (reset = '1') then
 			counter_next <= (others => '0');
-		elsif (state_reg = state_next) then
+		elsif (state_reg = state_next and clk'event and clk='1') then
 			counter_next <= counter_reg + 1;
+		elsif (state_reg = state_next and clk'event and clk='0') then
+			counter_next <= counter_reg;
 		else
 			counter_next <= (others => '0');
 		end if;
@@ -82,25 +84,25 @@ begin
 	begin
 		case state_reg is
 			when sync =>
-				if (counter_reg <= 96) then
+				if (counter_reg < 96) then
 					state_next <= sync;
 				else
 					state_next <= back_porch;
 				end if;
 			when back_porch =>
-				if (counter_reg <= 48) then
+				if (counter_reg < 48) then
 					state_next <= back_porch;
 				else
 					state_next <= completed_sig_gen;
 				end if;
 			when active_video =>
-				if (counter_reg <= 640) then
+				if (counter_reg < 640) then
 					state_next <= active_video;
 				else
 					state_next <= front_porch;
 				end if;
 			when front_porch =>
-				if (counter_reg <= 16) then
+				if (counter_reg < 16) then
 					state_next <= front_porch;
 				else
 					state_next <= sync;
@@ -110,7 +112,7 @@ begin
 		end case;
 	end process;
 	--output logic
-	process(state_next)
+	process(state_next, counter_reg)
 	begin
 		case state_next is
 			when sync =>

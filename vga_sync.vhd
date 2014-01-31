@@ -35,7 +35,8 @@ entity vga_sync is
 		v_completed : out std_logic;
 		blank			: out std_logic;
 		row			: out unsigned(10 downto 0);
-		column		: out unsigned(10 downto 0)
+		column		: out unsigned(10 downto 0);
+		v_counter	: out unsigned(10 downto 0)
 	);
 end vga_sync;
 
@@ -54,16 +55,16 @@ end component;
 component v_sync_gen
 	port ( clk				: in std_logic;
 			 reset			: in std_logic;
-			 h_blank 		: in std_logic;
 			 h_completed 	: in std_logic;
 			 v_sync			: out std_logic;
 			 blank			: out std_logic;
 			 completed 		: out std_logic;
-			 row				: out unsigned(10 downto 0)
+			 row				: out unsigned(10 downto 0);
+			 counter			: out unsigned(10 downto 0)
 	);
 end component;
 
-signal h_blank_sig, h_completed_sig: std_logic;
+signal h_blank_sig, v_blank_sig, h_completed_sig: std_logic;
 
 begin
 
@@ -81,13 +82,16 @@ v_sync_instance: v_sync_gen
 	port map(
 		clk => clk,
 		reset => reset,
-		h_blank => h_blank_sig,
 		h_completed => h_completed_sig,
 		v_sync => v_sync,
-		blank => blank,
+		blank => v_blank_sig,
 		completed => v_completed,
-		row => row
+		row => row,
+		counter => v_counter
 	);
+
+blank <= '1' when (h_blank_sig ='1' and v_blank_sig = '1') else
+			'0';
 
 end Behavioral;
 

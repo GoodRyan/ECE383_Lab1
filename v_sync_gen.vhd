@@ -26,7 +26,6 @@ use UNISIM.VComponents.all;
 entity v_sync_gen is
 	port ( clk				: in std_logic;
 			 reset			: in std_logic;
-			 h_blank 		: in std_logic;
 			 h_completed 	: in std_logic;
 			 v_sync			: out std_logic;
 			 blank			: out std_logic;

@@ -40,7 +40,6 @@ ARCHITECTURE behavior OF v_sync_test IS
     PORT(
          clk : IN  std_logic;
          reset : IN  std_logic;
-         h_blank : IN  std_logic;
          h_completed : IN  std_logic;
          v_sync : OUT  std_logic;
          blank : OUT  std_logic;
@@ -64,7 +63,6 @@ end component;
    --Inputs
    signal clk : std_logic := '0';
    signal reset : std_logic := '0';
-   signal h_blank : std_logic := '0';
    signal h_completed : std_logic := '0';
 
  	--Outputs
@@ -83,7 +81,6 @@ BEGIN
    uut: v_sync_gen PORT MAP (
           clk => clk,
           reset => reset,
-          h_blank => h_blank,
           h_completed => h_completed,
           v_sync => v_sync,
           blank => blank,

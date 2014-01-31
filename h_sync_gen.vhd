@@ -43,16 +43,15 @@ architecture h_sync_arch of h_sync_gen is
 	signal column_next, column_reg: unsigned (10 downto 0);
 begin
 	--counter
+	counter_next <= 	(others => '0') when state_next /= state_reg else
+							counter_reg + 1;
+	
 	process(clk, reset)
 	begin
-		if (reset = '1') then
-			counter_next <= (others => '0');
-		elsif (state_reg = state_next and clk'event and clk='1') then
-			counter_next <= counter_reg + 1;
-		elsif (state_reg = state_next and clk'event and clk='0') then
-			counter_next <= counter_reg;
-		else
-			counter_next <= (others => '0');
+		if reset = '1' then
+			counter_reg <= (others => '0');
+		elsif rising_edge(clk) then
+			counter_reg <= counter_next;
 		end if;
 	end process;
 	--state register
@@ -147,6 +146,5 @@ begin
 	blank <= blank_reg;
 	column <= column_reg;
 	completed <= completed_reg;
-	counter_reg <= counter_next;
 end h_sync_arch;
 

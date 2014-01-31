@@ -31,7 +31,8 @@ entity v_sync_gen is
 			 v_sync			: out std_logic;
 			 blank			: out std_logic;
 			 completed 		: out std_logic;
-			 row				: out unsigned(10 downto 0)
+			 row				: out unsigned(10 downto 0);
+			 counter			: out unsigned(10 downto 0)
 	);
 end v_sync_gen;
 
@@ -46,20 +47,21 @@ architecture v_sync_arch of v_sync_gen is
 	signal row_next, row_reg: unsigned (10 downto 0);
 
 begin
-			
+	
 	--counter
+	counter_next <= 	(others => '0') when state_next /= state_reg else
+							counter_reg + 1 when h_completed = '1' else
+							counter_reg;
+	
 	process(clk, reset)
 	begin
-		if (reset = '1') then
-			counter_next <= (others => '0');
-		elsif (state_reg = state_next and clk'event and clk='1' and h_completed='1') then
-			counter_next <= counter_reg + 1;
-		elsif (state_reg = state_next and clk'event and clk='0' and h_completed='0') then
-			counter_next <= counter_reg;
-		else
-			counter_next <= (others => '0');
+		if reset = '1' then
+			counter_reg <= (others => '0');
+		elsif rising_edge(clk) then
+			counter_reg <= counter_next;
 		end if;
 	end process;
+	
 	--state register
 	process(clk, reset)
 	begin
@@ -69,6 +71,7 @@ begin
 			state_reg <= state_next;
 		end if;
 	end process;
+	
 	--output buffer
 	process(clk, reset)
 	begin
@@ -137,11 +140,7 @@ begin
 				completed_next <= '1';
 			when active_video =>
 				v_sync_next <= '1';
-				if (h_blank = '0') then
-					blank_next <= '0';
-				else
-					blank_next <= '1';
-				end if;
+				blank_next <= '0';
 				row_next <= counter_reg;
 				completed_next <= '0';
 			when front_porch =>
@@ -156,6 +155,6 @@ begin
 	blank <= blank_reg;
 	row <= row_reg;
 	completed <= completed_reg;
-	counter_reg <= counter_next;
+	counter <= counter_reg;
 end v_sync_arch;
 

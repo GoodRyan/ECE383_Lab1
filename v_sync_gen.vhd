@@ -36,6 +36,7 @@ entity v_sync_gen is
 end v_sync_gen;
 
 architecture v_sync_arch of v_sync_gen is
+
 	type state_type is
 		(sync, back_porch, active_video, front_porch, completed_sig_gen);
 	signal state_reg, state_next: state_type;
@@ -43,7 +44,22 @@ architecture v_sync_arch of v_sync_gen is
 	signal v_sync_reg, blank_reg, completed_reg: std_logic;
 	signal v_sync_next, blank_next, completed_next: std_logic;
 	signal row_next, row_reg: unsigned (10 downto 0);
+
 begin
+			
+	--counter
+	process(clk, reset)
+	begin
+		if (reset = '1') then
+			counter_next <= (others => '0');
+		elsif (state_reg = state_next and clk'event and clk='1' and h_completed='1') then
+			counter_next <= counter_reg + 1;
+		elsif (state_reg = state_next and clk'event and clk='0' and h_completed='0') then
+			counter_next <= counter_reg;
+		else
+			counter_next <= (others => '0');
+		end if;
+	end process;
 	--state register
 	process(clk, reset)
 	begin
@@ -73,25 +89,25 @@ begin
 	begin
 		case state_reg is
 			when sync =>
-				if (counter_reg <= 2) then
+				if (counter_reg < 2) then
 					state_next <= sync;
 				else
 					state_next <= back_porch;
 				end if;
 			when back_porch =>
-				if (counter_reg <= 33) then
+				if (counter_reg < 33) then
 					state_next <= back_porch;
 				else
 					state_next <= completed_sig_gen;
 				end if;
 			when active_video =>
-				if (counter_reg <= 480) then
+				if (counter_reg < 480) then
 					state_next <= active_video;
 				else
 					state_next <= front_porch;
 				end if;
 			when front_porch =>
-				if (counter_reg <= 10) then
+				if (counter_reg < 10) then
 					state_next <= front_porch;
 				else
 					state_next <= sync;
@@ -101,7 +117,7 @@ begin
 		end case;
 	end process;
 	--output logic
-	process(state_next)
+	process(state_next, h_completed)
 	begin
 		case state_next is
 			when sync =>
@@ -121,7 +137,11 @@ begin
 				completed_next <= '1';
 			when active_video =>
 				v_sync_next <= '1';
-				blank_next <= '0';
+				if (h_blank = '0') then
+					blank_next <= '0';
+				else
+					blank_next <= '1';
+				end if;
 				row_next <= counter_reg;
 				completed_next <= '0';
 			when front_porch =>
@@ -131,7 +151,7 @@ begin
 				completed_next <= '0';
 		end case;
 	end process;
-	--output
+	--output	
 	v_sync <= v_sync_reg;
 	blank <= blank_reg;
 	row <= row_reg;

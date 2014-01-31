@@ -61,7 +61,7 @@ ARCHITECTURE behavior OF h_sync_test IS
    signal column : unsigned(10 downto 0);
 
    -- Clock period definitions
-   constant clk_period : time := 10 ns;
+   constant clk_period : time := 1 ns;
  
 BEGIN
  
@@ -88,7 +88,6 @@ BEGIN
    -- Stimulus process
    stim_proc: process
    begin		
-      -- hold reset state for 100 ns.
       wait for clk_period;	
 		
 		reset <= '1';

@@ -45,7 +45,9 @@ begin
 	--counter
 	process(clk, reset)
 	begin
-		if (state_reg = state_next) then
+		if (reset = '1') then
+			counter_next <= (others => '0');
+		elsif (state_reg = state_next) then
 			counter_next <= counter_reg + 1;
 		else
 			counter_next <= (others => '0');
@@ -143,5 +145,6 @@ begin
 	blank <= blank_reg;
 	column <= column_reg;
 	completed <= completed_reg;
+	counter_reg <= counter_next;
 end h_sync_arch;
 

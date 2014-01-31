@@ -44,15 +44,6 @@ architecture v_sync_arch of v_sync_gen is
 	signal v_sync_next, blank_next, completed_next: std_logic;
 	signal row_next, row_reg: unsigned (10 downto 0);
 begin
-	--counter
-	process(clk, reset)
-	begin
-		if (state_reg = state_next) then
-			counter_next <= counter_reg + 1;
-		else
-			counter_next <= (others => '0');
-		end if;
-	end process;
 	--state register
 	process(clk, reset)
 	begin

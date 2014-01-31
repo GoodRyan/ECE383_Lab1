@@ -42,6 +42,15 @@ architecture h_sync_arch of h_sync_gen is
 	signal h_sync_next, blank_next, completed_next: std_logic;
 	signal column_next, column_reg: unsigned (10 downto 0);
 begin
+	--counter
+	process(clk, reset)
+	begin
+		if (state_reg = state_next) then
+			counter_next <= counter_reg + 1;
+		else
+			counter_next <= (others => '0');
+		end if;
+	end process;
 	--state register
 	process(clk, reset)
 	begin

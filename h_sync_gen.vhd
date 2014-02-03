@@ -89,7 +89,7 @@ begin
 					state_next <= back_porch;
 				end if;
 			when back_porch =>
-				if (counter_reg < 48) then
+				if (counter_reg < 47) then
 					state_next <= back_porch;
 				else
 					state_next <= completed_sig_gen;

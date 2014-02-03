@@ -62,7 +62,7 @@ ARCHITECTURE behavior OF h_sync_test IS
 
 
    -- Clock period definitions
-   constant clk_period : time := 1 ns;
+   constant clk_period : time := 40 ns;
  
 BEGIN
  
@@ -98,12 +98,43 @@ BEGIN
 		reset <= '0';
 		wait for clk_period;
 		
+		--Test Sync
 		assert h_sync = '0' report "sync h_sync incorrect" severity error;
 		assert blank = '1' report "sync blank incorrect" severity error;
 		assert completed = '0' report "sync completed incorrect" severity error;
 		assert column = "00000000000" report "sync column incorrect" severity error;
+		
+		--Test Back Porch
+		wait for clk_period*96;
+		assert h_sync = '1' report "Back porch h_sync incorrect" severity error;
+		assert blank = '1' report "Back porch blank incorrect" severity error;
+		assert completed = '0' report "Back porch completed incorrect" severity error;
+		assert column = "00000000000" report "Back porch column incorrect" severity error;
+		
+		--Test completed
+		wait for clk_period*48;
+		assert h_sync = '1' report "Completed h_sync incorrect" severity error;
+		assert blank = '1' report "Completed blank incorrect" severity error;
+		assert completed = '1' report "Completed 'completed' incorrect" severity error;
+		assert column = "00000000000" report "Completed column incorrect" severity error;
 
-      -- insert stimulus here 
+      --Test Active Video
+		wait for clk_period*1;
+		assert h_sync = '1' report "Active Vid h_sync incorrect" severity error;
+		assert blank = '0' report "Active Vid blank incorrect" severity error;
+		assert completed = '0' report "Active Vid completed incorrect" severity error;
+		assert column = "00000000000" report "Active Vid column incorrect" severity error;
+		
+		wait for clk_period*11;
+		assert column = "00000001010" report "Active Vid column(count 10) incorrect" 
+		severity error;
+		
+		--Test Front Porch
+		wait for clk_period*630;
+		assert h_sync = '1' report "Front Porch h_sync incorrect" severity error;
+		assert blank = '1' report "Front Porch blank incorrect" severity error;
+		assert completed = '0' report "Front Porch completed incorrect" severity error;
+		assert column = "00000000000" report "Front Porch column incorrect" severity error;
 
       wait;
    end process;

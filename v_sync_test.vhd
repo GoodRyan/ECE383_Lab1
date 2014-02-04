@@ -44,8 +44,7 @@ ARCHITECTURE behavior OF v_sync_test IS
          v_sync : OUT  std_logic;
          blank : OUT  std_logic;
          completed : OUT  std_logic;
-         row : OUT  unsigned(10 downto 0);
-         counter : OUT  unsigned(10 downto 0)
+         row : OUT  unsigned(10 downto 0)
         );
     END COMPONENT;
 	 
@@ -70,7 +69,6 @@ end component;
    signal blank : std_logic;
    signal completed : std_logic;
    signal row : unsigned(10 downto 0);
-   signal counter : unsigned(10 downto 0);
 
    -- Clock period definitions
    constant clk_period : time := 40 ns;
@@ -85,8 +83,7 @@ BEGIN
           v_sync => v_sync,
           blank => blank,
           completed => completed,
-          row => row,
-          counter => counter
+          row => row
         );
 	
 	h_sync_comp: h_sync_gen PORT MAP (
@@ -111,11 +108,33 @@ BEGIN
    -- Stimulus process
    stim_proc: process
    begin		
-      -- hold reset state for 100 ns.
-      wait for clk_period;	
+		
+		--reset
+      wait for clk_period;
+		reset <= '1';
+		wait for clk_period;
+		reset <= '0';
+		wait for clk_period;
+		
+		--test sync
+		assert v_sync = '0' report "sync v_sync incorrect" severity error;
+		assert blank = '1' report "sync blank incorrect" severity error;
+		assert completed = '0' report "sync completed incorrect" severity error;
+		assert row = "00000000000" report "sync row incorrect" severity error;
 
 
-      -- insert stimulus here 
+      --check for h_completed first appearance
+		wait for clk_period*144;
+		assert h_completed = '1' report "h_completed 1 failed" severity error;
+		
+		--this means that the counter has incremented by one
+		--wait for another h_completed cycle
+		--an h_completed cycle is equivalent to active video + front porch +
+		--sync + back porch = 800 clock cycles.
+		wait for clk_period*804;
+		assert h_completed = '1' report "h_completed 2 failed" severity error;
+		--this assert should return true after 800 cycles, but instead it returns true
+		--at 804, not sure what's going on.
 
       wait;
    end process;

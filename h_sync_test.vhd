@@ -129,8 +129,12 @@ BEGIN
 		assert column = "00000001010" report "Active Vid column(count 10) incorrect" 
 		severity error;
 		
+		wait for clk_period*50;
+		assert column = "00000111100" report "Active vid column(count 60) incorrect"
+		severity error;
+		
 		--Test Front Porch
-		wait for clk_period*630;
+		wait for clk_period*581;
 		assert h_sync = '1' report "Front Porch h_sync incorrect" severity error;
 		assert blank = '1' report "Front Porch blank incorrect" severity error;
 		assert completed = '0' report "Front Porch completed incorrect" severity error;

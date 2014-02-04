@@ -124,17 +124,24 @@ BEGIN
 
 
       --check for h_completed first appearance
-		wait for clk_period*144;
+		wait for clk_period*142;
 		assert h_completed = '1' report "h_completed 1 failed" severity error;
 		
 		--this means that the counter has incremented by one
 		--wait for another h_completed cycle
 		--an h_completed cycle is equivalent to active video + front porch +
 		--sync + back porch = 800 clock cycles.
-		wait for clk_period*804;
+		wait for clk_period*800;
 		assert h_completed = '1' report "h_completed 2 failed" severity error;
 		--this assert should return true after 800 cycles, but instead it returns true
 		--at 804, not sure what's going on.
+		
+		--test Back Porch
+		wait for clk_period*2;
+		assert v_sync = '1' report "Back porch v_sync incorrect" severity error;
+		assert blank = '1' report "Back porch blank incorrect" severity error;
+		assert completed = '0' report "Back porch completed incorrect" severity error;
+		assert row = "00000000000" report "Back porch row incorrect" severity error;
 
       wait;
    end process;

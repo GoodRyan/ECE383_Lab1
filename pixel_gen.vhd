@@ -39,9 +39,29 @@ entity pixel_gen is
 end pixel_gen;
 
 architecture Behavioral of pixel_gen is
-
 begin
 
+	process (row, column, blank)
+	begin
+		r <= (others => '0');
+		g <= (others => '0');
+		b <= (others => '0');
+		if blank = '0' then
+			if (row < 200 and column < 300) then
+				r <= (others => '1');
+				g <= (others => '0');
+				b <= (others => '0');
+			elsif (row < 200 and column >=300) then
+			   r <= (others => '0');
+				g <= (others => '1');
+				b <= (others => '0');
+			elsif (row >= 200) then
+			   r <= (others => '0');
+				g <= (others => '0');
+				b <= (others => '1');
+			end if;
+		end if;
+	end process;
 
 end Behavioral;
 

@@ -30,8 +30,7 @@ entity v_sync_gen is
 			 v_sync			: out std_logic;
 			 blank			: out std_logic;
 			 completed 		: out std_logic;
-			 row				: out unsigned(10 downto 0);
-			 counter			: out unsigned(10 downto 0)
+			 row				: out unsigned(10 downto 0)
 	);
 end v_sync_gen;
 
@@ -64,62 +63,54 @@ begin
 	--state register
 	process(clk, reset)
 	begin
-		if (reset='1') then
+		if reset='1' then
 			state_reg <= sync;
-		elsif (clk'event and clk='1') then
+		elsif rising_edge(clk) then
 			state_reg <= state_next;
 		end if;
 	end process;
 	
 	--output buffer
-	process(clk, reset)
+	process(clk)
 	begin
-		if (reset='1') then
-			v_sync_reg <= '0';
-			blank_reg <= '1';
-			row_reg <= (others => '0');
-			completed_reg <= '0';
-		elsif (clk'event and clk='1') then
+		if rising_edge(clk) then
 			v_sync_reg <= v_sync_next;
 			blank_reg <= blank_next;
 			row_reg <= row_next;
 			completed_reg <= completed_next;
 		end if;
 	end process;
+	
 	--next-state logic
-	process(clk, reset)
+	process(state_next, counter_reg, h_completed)
 	begin
-		case state_reg is
-			when sync =>
-				if (counter_reg < 2) then
-					state_next <= sync;
-				else
-					state_next <= back_porch;
-				end if;
-			when back_porch =>
-				if (counter_reg < 33) then
-					state_next <= back_porch;
-				else
-					state_next <= completed_sig_gen;
-				end if;
-			when active_video =>
-				if (counter_reg < 480) then
+		state_next <= state_reg;
+		if h_completed = '1' then
+			case state_reg is
+				when sync =>
+					if (counter_reg >= 1) then
+						state_next <= back_porch;
+					end if;
+				when back_porch =>
+					if (counter_reg >= 31) then
+						state_next <= completed_sig_gen;
+					end if;
+				when active_video =>
+					if (counter_reg >= 479) then
+						state_next <= front_porch;
+					end if;
+				when front_porch =>
+					if (counter_reg >= 9) then
+						state_next <= sync;
+					end if;
+				when completed_sig_gen =>
 					state_next <= active_video;
-				else
-					state_next <= front_porch;
-				end if;
-			when front_porch =>
-				if (counter_reg < 10) then
-					state_next <= front_porch;
-				else
-					state_next <= sync;
-				end if;
-			when completed_sig_gen =>
-				state_next <= active_video;
-		end case;
+			end case;
+		end if;
 	end process;
+	
 	--output logic
-	process(state_next, h_completed)
+	process(state_next, counter_next)
 	begin
 		case state_next is
 			when sync =>
@@ -140,7 +131,7 @@ begin
 			when active_video =>
 				v_sync_next <= '1';
 				blank_next <= '0';
-				row_next <= counter_reg;
+				row_next <= counter_next;
 				completed_next <= '0';
 			when front_porch =>
 				v_sync_next <= '1';
@@ -154,6 +145,5 @@ begin
 	blank <= blank_reg;
 	row <= row_reg;
 	completed <= completed_reg;
-	counter <= counter_reg;
 end v_sync_arch;
 

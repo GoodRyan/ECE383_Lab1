@@ -15,14 +15,42 @@ that drive whether or not a color is displayed, or nothing is displayed at all b
 Below is a state diagram showing these states, their outputs, and how they are interconnected 
 to form a Moore machine.
 
-![alt tag](state_machine_diagram.png)
+![alt tag](state_machine_diagram.PNG)
 
 To allow these machines to function appropriately, it was necessary to use “look ahead buffer” logic, 
 which prevented glitches by helping to smooth out the process of moving to the next state register, 
 or the next counter/column number. Note how in the code below, 
 the new data values are set to a buffer before being transitioned to the actual signal.
 
---To do: transfer code
+#Code that permits buffering
+```vhdl
+when sync =>
+  h_sync_next <= '0';
+  blank_next <= '1';
+  column_next <= (others => '0');
+  completed_next <= '0';
+```
+
+```vhdl
+--output buffer
+process(clk)
+begin
+  if (rising_edge(clk)) then
+    h_sync_reg <= h_sync_next;
+    blank_reg <= blank_next;
+    column_reg <= column_next;
+    completed_reg <= completed_next;
+  end if;
+end process;
+```
+
+```vhdl
+--output
+h_sync <= h_sync_reg;
+blank <= blank_reg;
+column <= column_reg;
+completed <= completed_reg;
+```
 
 The first block of code is the state machine applying its logic, while the second block of code 
 is the buffer for that logic. Finally, the last block shows the code being sent to the actual outputs.

@@ -90,3 +90,5 @@ and how it fits into the bigger picture. For future classes, I would recommend i
 they need to use the configuration file to enable their switches to work appropriately. I would
 not have been able to figure this out without teacher assistance, and know some of my classmates
 had no idea that this was necessary until I informed them of how I completed the functionality.
+
+![alt tag](because_vhdl.PNG)

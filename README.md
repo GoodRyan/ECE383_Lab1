@@ -15,7 +15,7 @@ that drive whether or not a color is displayed, or nothing is displayed at all b
 Below is a state diagram showing these states, their outputs, and how they are interconnected 
 to form a Moore machine.
 
-![alt tag](https://raw.github.com/GoodRyan/ECE383_Lab1/master/state_machine_diagram.png)
+![alt tag](state_machine_diagram.png)
 
 To allow these machines to function appropriately, it was necessary to use “look ahead buffer” logic, 
 which prevented glitches by helping to smooth out the process of moving to the next state register, 

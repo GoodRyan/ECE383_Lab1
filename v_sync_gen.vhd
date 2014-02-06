@@ -24,6 +24,12 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity v_sync_gen is
+	generic(
+			  sync_count: natural;
+			  back_porch_count: natural;
+			  active_video_count: natural;
+			  front_porch_count: natural
+	);
 	port ( clk				: in std_logic;
 			 reset			: in std_logic;
 			 h_completed 	: in std_logic;
@@ -88,19 +94,19 @@ begin
 		if h_completed = '1' then
 			case state_reg is
 				when sync =>
-					if (counter_reg >= 1) then
+					if (counter_reg >= sync_count - 1) then
 						state_next <= back_porch;
 					end if;
 				when back_porch =>
-					if (counter_reg >= 31) then
+					if (counter_reg >= back_porch_count - 2) then
 						state_next <= completed_sig_gen;
 					end if;
 				when active_video =>
-					if (counter_reg >= 479) then
+					if (counter_reg >= active_video_count - 1) then
 						state_next <= front_porch;
 					end if;
 				when front_porch =>
-					if (counter_reg >= 9) then
+					if (counter_reg >= front_porch_count - 1) then
 						state_next <= sync;
 					end if;
 				when completed_sig_gen =>

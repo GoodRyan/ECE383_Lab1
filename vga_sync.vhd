@@ -35,14 +35,19 @@ entity vga_sync is
 		v_completed : out std_logic;
 		blank			: out std_logic;
 		row			: out unsigned(10 downto 0);
-		column		: out unsigned(10 downto 0);
-		v_counter	: out unsigned(10 downto 0)
+		column		: out unsigned(10 downto 0)
 	);
 end vga_sync;
 
 architecture Behavioral of vga_sync is
 
 component h_sync_gen
+	generic(
+			  sync_count: natural;
+			  back_porch_count: natural;
+			  active_video_count: natural;
+			  front_porch_count: natural
+	);
 	port( clk			: in std_logic;
 			reset			: in std_logic;
 			h_sync		: out std_logic;
@@ -53,14 +58,19 @@ component h_sync_gen
 end component;
 
 component v_sync_gen
+	generic(
+			  sync_count: natural;
+			  back_porch_count: natural;
+			  active_video_count: natural;
+			  front_porch_count: natural
+	);
 	port ( clk				: in std_logic;
 			 reset			: in std_logic;
 			 h_completed 	: in std_logic;
 			 v_sync			: out std_logic;
 			 blank			: out std_logic;
 			 completed 		: out std_logic;
-			 row				: out unsigned(10 downto 0);
-			 counter			: out unsigned(10 downto 0)
+			 row				: out unsigned(10 downto 0)
 	);
 end component;
 
@@ -69,6 +79,12 @@ signal h_blank_sig, v_blank_sig, h_completed_sig: std_logic;
 begin
 
 h_sync_instance: h_sync_gen
+	generic map( 
+	sync_count=>95, 
+	back_porch_count=>47,
+	active_video_count=>639,
+	front_porch_count=>15
+	)
 	port map(
 		clk => clk,
 		reset => reset,
@@ -79,6 +95,12 @@ h_sync_instance: h_sync_gen
 	);
 
 v_sync_instance: v_sync_gen
+	generic map( 
+	sync_count=>2, 
+	back_porch_count=>33,
+	active_video_count=>480,
+	front_porch_count=>10
+	)
 	port map(
 		clk => clk,
 		reset => reset,
@@ -86,11 +108,10 @@ v_sync_instance: v_sync_gen
 		v_sync => v_sync,
 		blank => v_blank_sig,
 		completed => v_completed,
-		row => row,
-		counter => v_counter
+		row => row
 	);
 
-blank <= '1' when (h_blank_sig ='1' and v_blank_sig = '1') else
+blank <= '1' when (h_blank_sig ='1' or v_blank_sig = '1') else
 			'0';
 
 end Behavioral;
